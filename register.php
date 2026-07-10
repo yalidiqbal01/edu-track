@@ -1,18 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Registration | EDU Track</title>
-
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css">
-</head>
-
-<body>
+<?php include("includes/header.php"); ?>
+<?php include("includes/navbar.php"); ?>
 
 <div class="container mt-5">
 
@@ -28,49 +15,62 @@
 
                 <div class="card-body">
 
-                    <form>
+                    <form method="POST" action="">
 
                         <div class="mb-3">
                             <label class="form-label">Full Name</label>
                             <input
                                 type="text"
+                                name="full_name"
                                 class="form-control"
-                                placeholder="Enter your full name">
+                                placeholder="Enter your full name"
+                                required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Student ID</label>
                             <input
                                 type="text"
+                                name="student_id"
                                 class="form-control"
-                                placeholder="2210XXXX">
+                                placeholder="2210XXXX"
+                                required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Email</label>
                             <input
                                 type="email"
+                                name="email"
                                 class="form-control"
-                                placeholder="student@iub.edu.bd">
+                                placeholder="student@iub.edu.bd"
+                                required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Password</label>
                             <input
                                 type="password"
+                                name="password"
                                 class="form-control"
-                                placeholder="********">
+                                placeholder="********"
+                                required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Confirm Password</label>
                             <input
                                 type="password"
+                                name="confirm_password"
                                 class="form-control"
-                                placeholder="********">
+                                placeholder="********"
+                                required>
                         </div>
 
-                        <button class="btn btn-primary w-100">
+                        <button
+                            type="submit"
+                            name="register"
+                            class="btn btn-primary w-100">
                             Register
                         </button>
 
@@ -78,10 +78,7 @@
 
                     <div class="text-center mt-3">
                         Already have an account?
-
-                        <a href="login.php">
-                            Login
-                        </a>
+                        <a href="login.php">Login</a>
                     </div>
 
                 </div>
@@ -94,5 +91,4 @@
 
 </div>
 
-</body>
-</html>
+<?php include("includes/footer.php"); ?>
