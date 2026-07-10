@@ -1,7 +1,64 @@
+<?php
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+include("includes/db.php");
+
+$message = "";
+
+if (isset($_POST['register'])) {
+
+    $full_name = trim($_POST['full_name']);
+    $student_id = trim($_POST['student_id']);
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
+    $confirm_password = $_POST['confirm_password'];
+
+    // Check password match
+    if ($password != $confirm_password) {
+
+        $message = "<div class='alert alert-danger'>Passwords do not match!</div>";
+
+    } else {
+
+        // Check duplicate Email or Student ID
+        $check = mysqli_query($conn, "SELECT * FROM users WHERE email='$email' OR student_id='$student_id'");
+
+        if (mysqli_num_rows($check) > 0) {
+
+            $message = "<div class='alert alert-warning'>Email or Student ID already exists!</div>";
+
+        } else {
+
+            // Hash password
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+            // Insert data
+            $sql = "INSERT INTO users (full_name, student_id, email, password)
+                    VALUES ('$full_name', '$student_id', '$email', '$hashed_password')";
+
+            if (mysqli_query($conn, $sql)) {
+
+                $message = "<div class='alert alert-success'>Registration Successful!</div>";
+
+            } else {
+
+                $message = "<div class='alert alert-danger'>Database Error: " . mysqli_error($conn) . "</div>";
+
+            }
+        }
+    }
+}
+
+?>
+
 <?php include("includes/header.php"); ?>
 <?php include("includes/navbar.php"); ?>
 
 <div class="container mt-5">
+
+    <?php echo $message; ?>
 
     <div class="row justify-content-center">
 
@@ -53,7 +110,7 @@
                                 type="password"
                                 name="password"
                                 class="form-control"
-                                placeholder="********"
+                                placeholder="Enter password"
                                 required>
                         </div>
 
@@ -63,7 +120,7 @@
                                 type="password"
                                 name="confirm_password"
                                 class="form-control"
-                                placeholder="********"
+                                placeholder="Confirm password"
                                 required>
                         </div>
 
