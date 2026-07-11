@@ -16,13 +16,29 @@ include("includes/navbar.php");
 
         <h2>Welcome, <?php echo $_SESSION['full_name']; ?> 👋</h2>
 
-        <p>You have successfully logged in to EDU Track.</p>
+        <p>You have successfully logged in to <strong>EDU Track</strong>.</p>
 
         <hr>
 
         <p><strong>Email:</strong> <?php echo $_SESSION['email']; ?></p>
 
         <p><strong>User ID:</strong> <?php echo $_SESSION['user_id']; ?></p>
+
+        <div class="mt-4">
+
+            <a href="add_assignment.php" class="btn btn-primary">
+                ➕ Add Assignment
+            </a>
+
+            <a href="view_assignments.php" class="btn btn-success">
+                📚 View Assignments
+            </a>
+
+            <a href="logout.php" class="btn btn-danger">
+                🚪 Logout
+            </a>
+
+        </div>
 
     </div>
 
