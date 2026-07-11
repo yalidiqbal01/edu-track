@@ -12,31 +12,60 @@ include("includes/navbar.php");
 
 $user_id = $_SESSION['user_id'];
 
-// Total Assignments
-$total_query = mysqli_query($conn, "SELECT COUNT(*) AS total FROM assignments WHERE user_id='$user_id'");
+// Total
+$total_query = mysqli_query($conn,"SELECT COUNT(*) AS total FROM assignments WHERE user_id='$user_id'");
 $total = mysqli_fetch_assoc($total_query)['total'];
 
-// Pending Assignments
-$pending_query = mysqli_query($conn, "SELECT COUNT(*) AS pending FROM assignments WHERE user_id='$user_id' AND status='Pending'");
+// Pending
+$pending_query = mysqli_query($conn,"SELECT COUNT(*) AS pending FROM assignments WHERE user_id='$user_id' AND status='Pending'");
 $pending = mysqli_fetch_assoc($pending_query)['pending'];
 
-// Completed Assignments
-$completed_query = mysqli_query($conn, "SELECT COUNT(*) AS completed FROM assignments WHERE user_id='$user_id' AND status='Completed'");
+// Completed
+$completed_query = mysqli_query($conn,"SELECT COUNT(*) AS completed FROM assignments WHERE user_id='$user_id' AND status='Completed'");
 $completed = mysqli_fetch_assoc($completed_query)['completed'];
+
+// Overdue
+$today = date("Y-m-d");
+
+$overdue_query = mysqli_query($conn,"
+SELECT COUNT(*) AS overdue
+FROM assignments
+WHERE user_id='$user_id'
+AND status='Pending'
+AND due_date<'$today'
+");
+
+$overdue = mysqli_fetch_assoc($overdue_query)['overdue'];
+
 ?>
 
 <div class="container mt-5">
 
-    <div class="mb-4">
-        <h2>Welcome, <?php echo $_SESSION['full_name']; ?> 👋</h2>
-        <p>Manage all your assignments from one place.</p>
-    </div>
+    <h2 class="mb-2">
+        Welcome, <?php echo $_SESSION['full_name']; ?> 👋
+    </h2>
 
-    <div class="row">
+    <p class="text-muted">
+        Manage all your assignments from one place.
+    </p>
+
+    <?php if($overdue>0){ ?>
+
+        <div class="alert alert-danger">
+
+            ⚠️ You have
+            <strong><?php echo $overdue; ?></strong>
+            overdue assignment(s)!
+
+        </div>
+
+    <?php } ?>
+
+    <div class="row mt-4">
 
         <div class="col-md-4 mb-3">
 
-            <div class="card text-center shadow">
+            <div class="card shadow text-center">
 
                 <div class="card-body">
 
@@ -52,13 +81,15 @@ $completed = mysqli_fetch_assoc($completed_query)['completed'];
 
         <div class="col-md-4 mb-3">
 
-            <div class="card text-center shadow">
+            <div class="card shadow text-center">
 
                 <div class="card-body">
 
                     <h5>Pending</h5>
 
-                    <h1 class="text-warning"><?php echo $pending; ?></h1>
+                    <h1 class="text-warning">
+                        <?php echo $pending; ?>
+                    </h1>
 
                 </div>
 
@@ -68,13 +99,15 @@ $completed = mysqli_fetch_assoc($completed_query)['completed'];
 
         <div class="col-md-4 mb-3">
 
-            <div class="card text-center shadow">
+            <div class="card shadow text-center">
 
                 <div class="card-body">
 
                     <h5>Completed</h5>
 
-                    <h1 class="text-success"><?php echo $completed; ?></h1>
+                    <h1 class="text-success">
+                        <?php echo $completed; ?>
+                    </h1>
 
                 </div>
 
@@ -95,10 +128,10 @@ $completed = mysqli_fetch_assoc($completed_query)['completed'];
         </a>
 
         <a href="logout.php" class="btn btn-danger">
-            Logout
+            🚪 Logout
         </a>
 
-  </div>
+    </div>
 
 </div>
 

@@ -37,6 +37,8 @@ if (isset($_GET['search'])) {
 }
 
 $result = mysqli_query($conn, $sql);
+
+$today = date("Y-m-d");
 ?>
 
 <div class="container mt-5">
@@ -58,7 +60,7 @@ $result = mysqli_query($conn, $sql);
                         placeholder="Search by title or subject..."
                         value="<?php echo htmlspecialchars($search); ?>">
 
-                    <button class="btn btn-primary" type="submit">
+                    <button class="btn btn-primary">
                         🔍 Search
                     </button>
 
@@ -97,9 +99,9 @@ $result = mysqli_query($conn, $sql);
 
         <tbody>
 
-        <?php if(mysqli_num_rows($result) > 0) { ?>
+        <?php if(mysqli_num_rows($result) > 0){ ?>
 
-            <?php while($row = mysqli_fetch_assoc($result)) { ?>
+            <?php while($row = mysqli_fetch_assoc($result)){ ?>
 
                 <tr>
 
@@ -113,19 +115,22 @@ $result = mysqli_query($conn, $sql);
 
                     <td>
 
-                        <?php if($row['status'] == "Pending") { ?>
+                        <?php
 
-                            <span class="badge bg-warning text-dark">
-                                Pending
-                            </span>
+                        if($row['status'] == "Completed")
+                        {
+                            echo "<span class='badge bg-success'>Completed</span>";
+                        }
+                        elseif($row['due_date'] < $today)
+                        {
+                            echo "<span class='badge bg-danger'>Overdue</span>";
+                        }
+                        else
+                        {
+                            echo "<span class='badge bg-warning text-dark'>Pending</span>";
+                        }
 
-                        <?php } else { ?>
-
-                            <span class="badge bg-success">
-                                Completed
-                            </span>
-
-                        <?php } ?>
+                        ?>
 
                     </td>
 
