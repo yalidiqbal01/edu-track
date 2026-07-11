@@ -71,8 +71,10 @@ $result = mysqli_query($conn, $sql);
                             Edit
                         </a>
 
-                        <a href="#" class="btn btn-danger btn-sm">
-                            Delete
+                        <a href="delete_assignment.php?id=<?php echo $row['id']; ?>"
+                           class="btn btn-danger btn-sm"
+                           onclick="return confirm('Are you sure you want to delete this assignment?');">
+                           Delete
                         </a>
 
                     </td>
