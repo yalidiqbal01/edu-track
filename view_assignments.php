@@ -12,33 +12,87 @@ include("includes/navbar.php");
 
 $user_id = $_SESSION['user_id'];
 
-$sql = "SELECT * FROM assignments WHERE user_id='$user_id' ORDER BY due_date ASC";
+// Search Feature
+$search = "";
+
+if (isset($_GET['search'])) {
+
+    $search = mysqli_real_escape_string($conn, $_GET['search']);
+
+    $sql = "SELECT *
+            FROM assignments
+            WHERE user_id='$user_id'
+            AND (
+                title LIKE '%$search%'
+                OR subject LIKE '%$search%'
+            )
+            ORDER BY due_date ASC";
+
+} else {
+
+    $sql = "SELECT *
+            FROM assignments
+            WHERE user_id='$user_id'
+            ORDER BY due_date ASC";
+}
+
 $result = mysqli_query($conn, $sql);
 ?>
 
 <div class="container mt-5">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-4">📚 My Assignments</h2>
 
-        <h2>📚 My Assignments</h2>
+    <div class="row mb-4">
 
-        <a href="add_assignment.php" class="btn btn-primary">
-            ➕ Add Assignment
-        </a>
+        <div class="col-md-8">
+
+            <form method="GET">
+
+                <div class="input-group">
+
+                    <input
+                        type="text"
+                        name="search"
+                        class="form-control"
+                        placeholder="Search by title or subject..."
+                        value="<?php echo htmlspecialchars($search); ?>">
+
+                    <button class="btn btn-primary" type="submit">
+                        🔍 Search
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+        <div class="col-md-4 text-end">
+
+            <a href="add_assignment.php" class="btn btn-success">
+                ➕ Add Assignment
+            </a>
+
+        </div>
 
     </div>
 
     <table class="table table-bordered table-hover shadow">
 
         <thead class="table-dark">
+
             <tr>
+
                 <th>ID</th>
                 <th>Title</th>
                 <th>Subject</th>
                 <th>Due Date</th>
                 <th>Status</th>
-                <th width="180">Actions</th>
+                <th width="200">Actions</th>
+
             </tr>
+
         </thead>
 
         <tbody>
@@ -58,23 +112,33 @@ $result = mysqli_query($conn, $sql);
                     <td><?php echo $row['due_date']; ?></td>
 
                     <td>
+
                         <?php if($row['status'] == "Pending") { ?>
-                            <span class="badge bg-warning text-dark">Pending</span>
+
+                            <span class="badge bg-warning text-dark">
+                                Pending
+                            </span>
+
                         <?php } else { ?>
-                            <span class="badge bg-success">Completed</span>
+
+                            <span class="badge bg-success">
+                                Completed
+                            </span>
+
                         <?php } ?>
+
                     </td>
 
                     <td>
 
                         <a href="edit_assignment.php?id=<?php echo $row['id']; ?>" class="btn btn-warning btn-sm">
-                            Edit
+                            ✏️ Edit
                         </a>
 
                         <a href="delete_assignment.php?id=<?php echo $row['id']; ?>"
                            class="btn btn-danger btn-sm"
                            onclick="return confirm('Are you sure you want to delete this assignment?');">
-                           Delete
+                            🗑 Delete
                         </a>
 
                     </td>
@@ -86,9 +150,11 @@ $result = mysqli_query($conn, $sql);
         <?php } else { ?>
 
             <tr>
+
                 <td colspan="6" class="text-center">
                     No assignments found.
                 </td>
+
             </tr>
 
         <?php } ?>
