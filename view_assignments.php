@@ -31,82 +31,65 @@ $result = mysqli_query($conn, $sql);
     <table class="table table-bordered table-hover shadow">
 
         <thead class="table-dark">
-
             <tr>
-
                 <th>ID</th>
                 <th>Title</th>
                 <th>Subject</th>
                 <th>Due Date</th>
                 <th>Status</th>
-                <th>Actions</th>
-
+                <th width="180">Actions</th>
             </tr>
-
         </thead>
 
         <tbody>
 
-        <?php
+        <?php if(mysqli_num_rows($result) > 0) { ?>
 
-        if(mysqli_num_rows($result) > 0)
-        {
-            while($row = mysqli_fetch_assoc($result))
-            {
-        ?>
+            <?php while($row = mysqli_fetch_assoc($result)) { ?>
 
-        <tr>
+                <tr>
 
-            <td><?php echo $row['id']; ?></td>
+                    <td><?php echo $row['id']; ?></td>
 
-            <td><?php echo $row['title']; ?></td>
+                    <td><?php echo $row['title']; ?></td>
 
-            <td><?php echo $row['subject']; ?></td>
+                    <td><?php echo $row['subject']; ?></td>
 
-            <td><?php echo $row['due_date']; ?></td>
+                    <td><?php echo $row['due_date']; ?></td>
 
-            <td>
-
-                <?php
-                if($row['status']=="Pending")
-                {
-                    echo "<span class='badge bg-warning text-dark'>Pending</span>";
-                }
-                else
-                {
-                    echo "<span class='badge bg-success'>Completed</span>";
-                }
-                ?>
-
-            </td>
-
-            <td>
-
-                <a href="#" class="btn btn-sm btn-warning">
-                    Edit
-                </a>
-
-                <a href="#" class="btn btn-sm btn-danger">
-                    Delete
-                </a>
-
-            </td>
-
-        </tr>
-
-        <?php
-            }
-        }
-        else
-        {
-            echo "<tr>
-                    <td colspan='6' class='text-center'>
-                        No assignments found.
+                    <td>
+                        <?php if($row['status'] == "Pending") { ?>
+                            <span class="badge bg-warning text-dark">Pending</span>
+                        <?php } else { ?>
+                            <span class="badge bg-success">Completed</span>
+                        <?php } ?>
                     </td>
-                  </tr>";
-        }
 
-        ?>
+                    <td>
+
+                        <a href="edit_assignment.php?id=<?php echo $row['id']; ?>" class="btn btn-warning btn-sm">
+                            Edit
+                        </a>
+
+                        <a href="#" class="btn btn-danger btn-sm">
+                            Delete
+                        </a>
+
+                    </td>
+
+                </tr>
+
+            <?php } ?>
+
+        <?php } else { ?>
+
+            <tr>
+                <td colspan="6" class="text-center">
+                    No assignments found.
+                </td>
+            </tr>
+
+        <?php } ?>
 
         </tbody>
 
