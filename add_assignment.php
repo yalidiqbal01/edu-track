@@ -10,23 +10,31 @@ include("includes/db.php");
 
 $message = "";
 
-if(isset($_POST['add_assignment']))
-{
-    $user_id = $_SESSION['user_id'];
-    $title = $_POST['title'];
-    $subject = $_POST['subject'];
+if (isset($_POST['add_assignment'])) {
+
+    $title = mysqli_real_escape_string($conn, $_POST['title']);
+    $subject = mysqli_real_escape_string($conn, $_POST['subject']);
     $due_date = $_POST['due_date'];
+    $priority = $_POST['priority'];
+    $status = $_POST['status'];
 
-    $sql = "INSERT INTO assignments(user_id, title, subject, due_date)
-            VALUES('$user_id','$title','$subject','$due_date')";
+    $user_id = $_SESSION['user_id'];
 
-    if(mysqli_query($conn, $sql))
-    {
-        $message = "<div class='alert alert-success'>Assignment Added Successfully!</div>";
-    }
-    else
-    {
-        $message = "<div class='alert alert-danger'>".mysqli_error($conn)."</div>";
+    $sql = "INSERT INTO assignments
+            (user_id, title, subject, due_date, priority, status)
+            VALUES
+            ('$user_id', '$title', '$subject', '$due_date', '$priority', '$status')";
+
+    if (mysqli_query($conn, $sql)) {
+
+        header("Location: view_assignments.php");
+        exit();
+
+    } else {
+
+        $message = "<div class='alert alert-danger'>
+                        ".mysqli_error($conn)."
+                    </div>";
     }
 }
 
@@ -36,41 +44,136 @@ include("includes/navbar.php");
 
 <div class="container mt-5">
 
-    <?php echo $message; ?>
+    <div class="row justify-content-center">
 
-    <div class="card shadow">
+        <div class="col-md-7">
 
-        <div class="card-header bg-primary text-white">
-            <h3>Add Assignment</h3>
-        </div>
+            <div class="card shadow">
 
-        <div class="card-body">
+                <div class="card-header bg-primary text-white">
 
-            <form method="POST">
+                    <h3>Add Assignment</h3>
 
-                <div class="mb-3">
-                    <label>Assignment Title</label>
-                    <input type="text" name="title" class="form-control" required>
                 </div>
 
-                <div class="mb-3">
-                    <label>Subject</label>
-                    <input type="text" name="subject" class="form-control" required>
+                <div class="card-body">
+
+                    <?php echo $message; ?>
+
+                    <form method="POST">
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Assignment Title
+                            </label>
+
+                            <input
+                                type="text"
+                                name="title"
+                                class="form-control"
+                                required>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Subject
+                            </label>
+
+                            <input
+                                type="text"
+                                name="subject"
+                                class="form-control"
+                                required>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Due Date
+                            </label>
+
+                            <input
+                                type="date"
+                                name="due_date"
+                                class="form-control"
+                                required>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Priority
+                            </label>
+
+                            <select
+                                name="priority"
+                                class="form-select"
+                                required>
+
+                                <option value="High">
+                                    🔴 High
+                                </option>
+
+                                <option value="Medium" selected>
+                                    🟡 Medium
+                                </option>
+
+                                <option value="Low">
+                                    🟢 Low
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Status
+                            </label>
+
+                            <select
+                                name="status"
+                                class="form-select">
+
+                                <option value="Pending">
+                                    Pending
+                                </option>
+
+                                <option value="Completed">
+                                    Completed
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <button
+                            type="submit"
+                            name="add_assignment"
+                            class="btn btn-primary">
+
+                            Save Assignment
+
+                        </button>
+
+                        <a href="view_assignments.php"
+                           class="btn btn-secondary">
+
+                            Cancel
+
+                        </a>
+
+                    </form>
+
                 </div>
 
-                <div class="mb-3">
-                    <label>Due Date</label>
-                    <input type="date" name="due_date" class="form-control" required>
-                </div>
-
-                <button
-                    type="submit"
-                    name="add_assignment"
-                    class="btn btn-primary">
-                    Add Assignment
-                </button>
-
-            </form>
+            </div>
 
         </div>
 

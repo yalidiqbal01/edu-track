@@ -11,162 +11,257 @@ include("includes/header.php");
 include("includes/navbar.php");
 
 $user_id = $_SESSION['user_id'];
+$today = date("Y-m-d");
 
-// Search Feature
-$search = "";
+// Search & Filter
+$search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : "";
+$subject_filter = isset($_GET['subject']) ? mysqli_real_escape_string($conn, $_GET['subject']) : "";
 
-if (isset($_GET['search'])) {
+// Load Subjects for Dropdown
+$subject_query = mysqli_query($conn,
+"SELECT DISTINCT subject
+FROM assignments
+WHERE user_id='$user_id'
+ORDER BY subject ASC");
 
-    $search = mysqli_real_escape_string($conn, $_GET['search']);
+// Main Query
+$sql = "SELECT *
+FROM assignments
+WHERE user_id='$user_id'";
 
-    $sql = "SELECT *
-            FROM assignments
-            WHERE user_id='$user_id'
-            AND (
-                title LIKE '%$search%'
-                OR subject LIKE '%$search%'
-            )
-            ORDER BY due_date ASC";
-
-} else {
-
-    $sql = "SELECT *
-            FROM assignments
-            WHERE user_id='$user_id'
-            ORDER BY due_date ASC";
+if($search != "")
+{
+    $sql .= " AND (title LIKE '%$search%' OR subject LIKE '%$search%')";
 }
 
-$result = mysqli_query($conn, $sql);
+if($subject_filter != "")
+{
+    $sql .= " AND subject='$subject_filter'";
+}
 
-$today = date("Y-m-d");
+$sql .= " ORDER BY due_date ASC";
+
+$result = mysqli_query($conn,$sql);
 ?>
 
 <div class="container mt-5">
 
-    <h2 class="mb-4">📚 My Assignments</h2>
+<h2 class="mb-4">📚 My Assignments</h2>
 
-    <div class="row mb-4">
+<div class="row mb-4">
 
-        <div class="col-md-8">
+<div class="col-md-4">
 
-            <form method="GET">
+<form method="GET">
 
-                <div class="input-group">
+<input
+type="text"
+name="search"
+class="form-control"
+placeholder="Search Assignment..."
+value="<?php echo htmlspecialchars($search); ?>">
 
-                    <input
-                        type="text"
-                        name="search"
-                        class="form-control"
-                        placeholder="Search by title or subject..."
-                        value="<?php echo htmlspecialchars($search); ?>">
+</div>
 
-                    <button class="btn btn-primary">
-                        🔍 Search
-                    </button>
+<div class="col-md-3">
 
-                </div>
+<select
+name="subject"
+class="form-select">
 
-            </form>
+<option value="">
+All Subjects
+</option>
 
-        </div>
+<?php
 
-        <div class="col-md-4 text-end">
+while($subject=mysqli_fetch_assoc($subject_query))
+{
 
-            <a href="add_assignment.php" class="btn btn-success">
-                ➕ Add Assignment
-            </a>
+$selected="";
 
-        </div>
+if($subject_filter==$subject['subject'])
+{
+$selected="selected";
+}
 
-    </div>
+?>
 
-    <table class="table table-bordered table-hover shadow">
+<option
+value="<?php echo $subject['subject']; ?>"
+<?php echo $selected; ?>>
 
-        <thead class="table-dark">
+<?php echo $subject['subject']; ?>
 
-            <tr>
+</option>
 
-                <th>ID</th>
-                <th>Title</th>
-                <th>Subject</th>
-                <th>Due Date</th>
-                <th>Status</th>
-                <th width="200">Actions</th>
+<?php } ?>
 
-            </tr>
+</select>
 
-        </thead>
+</div>
 
-        <tbody>
+<div class="col-md-2">
 
-        <?php if(mysqli_num_rows($result) > 0){ ?>
+<button
+class="btn btn-primary w-100">
 
-            <?php while($row = mysqli_fetch_assoc($result)){ ?>
+🔍 Search
 
-                <tr>
+</button>
 
-                    <td><?php echo $row['id']; ?></td>
+</div>
 
-                    <td><?php echo $row['title']; ?></td>
+</form>
 
-                    <td><?php echo $row['subject']; ?></td>
+<div class="col-md-3 text-end">
 
-                    <td><?php echo $row['due_date']; ?></td>
+<a
+href="add_assignment.php"
+class="btn btn-success">
 
-                    <td>
+➕ Add Assignment
 
-                        <?php
+</a>
 
-                        if($row['status'] == "Completed")
-                        {
-                            echo "<span class='badge bg-success'>Completed</span>";
-                        }
-                        elseif($row['due_date'] < $today)
-                        {
-                            echo "<span class='badge bg-danger'>Overdue</span>";
-                        }
-                        else
-                        {
-                            echo "<span class='badge bg-warning text-dark'>Pending</span>";
-                        }
+</div>
 
-                        ?>
+</div>
 
-                    </td>
+<table class="table table-bordered table-hover shadow">
 
-                    <td>
+<thead class="table-dark">
 
-                        <a href="edit_assignment.php?id=<?php echo $row['id']; ?>" class="btn btn-warning btn-sm">
-                            ✏️ Edit
-                        </a>
+<tr>
 
-                        <a href="delete_assignment.php?id=<?php echo $row['id']; ?>"
-                           class="btn btn-danger btn-sm"
-                           onclick="return confirm('Are you sure you want to delete this assignment?');">
-                            🗑 Delete
-                        </a>
+<th>ID</th>
+<th>Title</th>
+<th>Subject</th>
+<th>Priority</th>
+<th>Due Date</th>
+<th>Status</th>
+<th width="200">Actions</th>
 
-                    </td>
+</tr>
 
-                </tr>
+</thead>
 
-            <?php } ?>
+<tbody>
 
-        <?php } else { ?>
+<?php
 
-            <tr>
+if(mysqli_num_rows($result)>0)
+{
 
-                <td colspan="6" class="text-center">
-                    No assignments found.
-                </td>
+while($row=mysqli_fetch_assoc($result))
+{
 
-            </tr>
+?>
 
-        <?php } ?>
+<tr>
 
-        </tbody>
+<td><?php echo $row['id']; ?></td>
 
-    </table>
+<td><?php echo $row['title']; ?></td>
+
+<td><?php echo $row['subject']; ?></td>
+
+<td>
+
+<?php
+
+if($row['priority']=="High")
+{
+echo "<span class='badge bg-danger'>🔴 High</span>";
+}
+elseif($row['priority']=="Medium")
+{
+echo "<span class='badge bg-warning text-dark'>🟡 Medium</span>";
+}
+else
+{
+echo "<span class='badge bg-success'>🟢 Low</span>";
+}
+
+?>
+
+</td>
+
+<td>
+
+<?php echo $row['due_date']; ?>
+
+</td>
+
+<td>
+
+<?php
+
+if($row['status']=="Completed")
+{
+echo "<span class='badge bg-success'>Completed</span>";
+}
+elseif($row['due_date']<$today)
+{
+echo "<span class='badge bg-danger'>Overdue</span>";
+}
+else
+{
+echo "<span class='badge bg-warning text-dark'>Pending</span>";
+}
+
+?>
+
+</td>
+
+<td>
+
+<a
+href="edit_assignment.php?id=<?php echo $row['id']; ?>"
+class="btn btn-warning btn-sm">
+
+✏️ Edit
+
+</a>
+
+<a
+href="delete_assignment.php?id=<?php echo $row['id']; ?>"
+class="btn btn-danger btn-sm"
+onclick="return confirm('Delete this assignment?')">
+
+🗑 Delete
+
+</a>
+
+</td>
+
+</tr>
+
+<?php
+
+}
+
+}
+else
+{
+
+?>
+
+<tr>
+
+<td colspan="7" class="text-center">
+
+No assignments found.
+
+</td>
+
+</tr>
+
+<?php } ?>
+
+</tbody>
+
+</table>
 
 </div>
 
